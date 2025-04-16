@@ -43,3 +43,13 @@ class USBDriveDetector:
                     pass
         
         return result
+
+
+    def get_private_key_path(self):
+        if not self._connected_drive:
+            raise ValueError("Brak podłączonego USB!")
+
+        for root, dirs, files in os.walk(self._connected_drive):
+            for file in files:
+                if file.endswith('.pem'):
+                    return os.path.join(root, file)
