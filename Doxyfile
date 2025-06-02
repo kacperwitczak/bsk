@@ -1,0 +1,56 @@
+# Doxyfile 1.14.0
+
+# Project info
+PROJECT_NAME           = "PDF signing and verifying app"
+PROJECT_BRIEF          = "Project for Security of Computer Systems course"
+OUTPUT_DIRECTORY       = docs
+CREATE_SUBDIRS         = NO
+
+# Input
+INPUT                  = crypto usb gui_app.py pdf_gui_app.py
+FILE_PATTERNS          = *.py
+RECURSIVE              = YES
+
+# Extraction
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+
+# Build options
+QUIET                  = NO
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_NO_PARAMDOC       = YES
+
+# Generate outputs
+GENERATE_HTML          = YES
+GENERATE_LATEX         = YES
+GENERATE_MAN           = NO
+GENERATE_RTF           = NO
+GENERATE_XML           = NO
+
+# HTML options
+HTML_OUTPUT            = html
+HTML_FILE_EXTENSION    = .html
+HTML_COLORSTYLE_HUE    = 220
+HTML_COLORSTYLE_SAT    = 100
+HTML_COLORSTYLE_GAMMA  = 80
+
+# LaTeX options
+LATEX_OUTPUT           = latex
+LATEX_BATCHMODE        = NO
+LATEX_HIDE_INDICES     = NO
+
+# Source Browser
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = YES
+STRIP_CODE_COMMENTS    = YES
+
+# Dot tool (for call graphs, class diagrams, etc.)
+HAVE_DOT               = NO
+
+# Python settings
+OPTIMIZE_OUTPUT_JAVA   = NO
+
+# Additional settings
+GENERATE_TAGFILE       =
