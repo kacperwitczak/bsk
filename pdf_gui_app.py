@@ -185,13 +185,129 @@ class PdfSignerCheckerApp:
 
     def sign_pdf(self):
         """Decrypts the private key using the PIN and signs the selected PDF."""
-        # [function body not repeated – unchanged logic, already clear]
-        ...
+        pdf_path = self.file_path_var.get()
+        pin = self.pin_entry.get()
+
+        if not pdf_path:
+            messagebox.showerror("Error", "Please select a PDF file!")
+            return
+
+        if not os.path.exists(pdf_path):
+            messagebox.showerror("Error", "PDF file not found!")
+            return
+
+        if not pin:
+            messagebox.showerror("Error", "Please enter your PIN!")
+            return
+
+        try:
+            # Get private key based on selection
+            if self.use_usb_key_var.get():
+                # Using USB key
+                if not self.usb_detector.is_drive_connected():
+                    messagebox.showerror("Error", "USB drive not connected!")
+                    return
+
+                # Find private key on USB
+                usb_key_path = self.usb_detector.get_private_key_path()
+                if not usb_key_path:
+                    messagebox.showerror("Error", "Private key file not found on USB!")
+                    return
+
+                # Read encrypted key from USB
+                with open(usb_key_path, "rb") as f:
+                    encrypted_data = f.read()
+            else:
+                # Using manually selected key
+                private_key_path = self.private_key_path_var.get()
+                if not private_key_path:
+                    messagebox.showerror("Error", "Please select a private key file!")
+                    return
+
+                if not os.path.exists(private_key_path):
+                    messagebox.showerror("Error", "Private key file not found!")
+                    return
+
+                # Read encrypted key from selected path
+                with open(private_key_path, "rb") as f:
+                    encrypted_data = f.read()
+
+            # Decrypt private key
+            self.status_value.config(text="Decrypting private key...", fg="blue")
+            self.root.update()
+
+            key_decryptor = KeyDecryptor(encrypted_data, pin)
+            private_key = key_decryptor.decrypt_private_key()
+
+            # Sign PDF
+            self.status_value.config(text="Signing PDF...", fg="blue")
+            self.root.update()
+
+            pdf_signer = PdfSigner(pdf_path)
+            signature = pdf_signer.sign_pdf(private_key)
+
+            self.status_value.config(text="PDF signed successfully!", fg="green")
+            self.results_text.delete(1.0, tk.END)
+            self.results_text.insert(tk.END, f"PDF file signed successfully!\n\n")
+            self.results_text.insert(tk.END, f"File: {os.path.basename(pdf_path)}\n")
+            self.results_text.insert(tk.END, f"Signature length: {len(signature)} bytes\n")
+
+        except Exception as e:
+            self.status_value.config(text="Error signing PDF!", fg="red")
+            messagebox.showerror("Error", f"Failed to sign PDF: {str(e)}")
+            self.results_text.delete(1.0, tk.END)
+            self.results_text.insert(tk.END, f"Error: {str(e)}")
 
     def verify_pdf(self):
         """Verifies the digital signature in the selected PDF using a public key."""
-        # [function body not repeated – unchanged logic, already clear]
-        ...
+        pdf_path = self.file_path_var.get()
+        public_key_path = self.public_key_path_var.get()
+
+        if not pdf_path:
+            messagebox.showerror("Error", "Please select a PDF file!")
+            return
+
+        if not os.path.exists(pdf_path):
+            messagebox.showerror("Error", "PDF file not found!")
+            return
+
+        if not public_key_path:
+            messagebox.showerror("Error", "Please select a public key file!")
+            return
+
+        if not os.path.exists(public_key_path):
+            messagebox.showerror("Error", "Public key file not found!")
+            return
+
+        try:
+            # Load public key from selected path
+            with open(public_key_path, "rb") as f:
+                public_key_pem = f.read()
+
+            public_key = serialization.load_pem_public_key(public_key_pem)
+
+            # Verify PDF
+            self.status_value.config(text="Verifying signature...", fg="blue")
+            self.root.update()
+
+            pdf_verifier = PdfVerifier(pdf_path)
+            is_valid, result = pdf_verifier.verify_signature(public_key)
+
+            self.results_text.delete(1.0, tk.END)
+
+            if is_valid:
+                self.status_value.config(text="Signature is valid!", fg="green")
+                self.results_text.insert(tk.END, "✓ Signature is valid!\n\n")
+                self.results_text.insert(tk.END, f"File: {os.path.basename(pdf_path)}\n")
+            else:
+                self.status_value.config(text="Invalid signature!", fg="red")
+                self.results_text.insert(tk.END, f"✗ Verification failed: {result}\n")
+
+        except Exception as e:
+            self.status_value.config(text="Error verifying PDF!", fg="red")
+            messagebox.showerror("Error", f"Failed to verify PDF: {str(e)}")
+            self.results_text.delete(1.0, tk.END)
+            self.results_text.insert(tk.END, f"Error: {str(e)}")
 
 
 if __name__ == "__main__":
