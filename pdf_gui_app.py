@@ -297,11 +297,11 @@ class PdfSignerCheckerApp:
 
             if is_valid:
                 self.status_value.config(text="Signature is valid!", fg="green")
-                self.results_text.insert(tk.END, "✓ Signature is valid!\n\n")
+                self.results_text.insert(tk.END, "Signature is valid!\n\n")
                 self.results_text.insert(tk.END, f"File: {os.path.basename(pdf_path)}\n")
             else:
                 self.status_value.config(text="Invalid signature!", fg="red")
-                self.results_text.insert(tk.END, f"✗ Verification failed: {result}\n")
+                self.results_text.insert(tk.END, f"Verification failed: {result}\n")
 
         except Exception as e:
             self.status_value.config(text="Error verifying PDF!", fg="red")
